@@ -50,44 +50,44 @@ def main():
         valid_df, meta_df, ou_df, prog_df, t1_stats = task01_ingest_and_flatten(spark, data_dir)
         logger.info(f"Task01 finished: {t1_stats}")
 
-        # # Task 02
-        # joined_df, unresolved_stats = task02_resolve_metadata(spark, valid_df, meta_df, ou_df, output_dir)
-        # logger.info(f"Task02 finished: {unresolved_stats}")
-        #
-        # # Task 03
-        # hier_df = task03_resolve_hierarchy(spark, joined_df, ou_df)
-        # logger.info("Task03 finished")
-        #
-        # # Task 04
-        # quality_df, completeness_df = task04_quality_and_flags(spark, hier_df, prog_df, output_dir)
-        # logger.info("Task04 finished")
-        #
-        # # Task 05
-        # fact_df = task05_build_dimensions_and_fact(spark, quality_df, meta_df, prog_df, output_dir, incremental=args.enable_b2)
-        # logger.info("Task05 finished")
-        #
-        # # Optional B1: validate fact contract
-        # if args.enable_b1:
-        #     logger.info("Running B1 data contract validation")
-        #     validate_contract(fact_df)
-        #
-        # # Task 06
-        # task06_program_analytics(spark, fact_df, output_dir)
-        # logger.info("Task06 finished")
-        #
-        # # Task 07
-        # task07_cross_country_aggregation(spark, fact_df, completeness_df, output_dir)
-        # logger.info("Task07 finished")
-        #
-        # # DQ checks
-        # quarantine_rate = t1_stats.get("quarantined", 0) / max(1, t1_stats.get("exploded_total", 1))
-        # if quarantine_rate > 0.10:
-        #     logger.error("Critical DQ: quarantine_rate > 10%")
-        #     sys.exit(2)
-        #
-        # if fact_df.count() == 0:
-        #     logger.error("Critical DQ: fact table is empty")
-        #     sys.exit(2)
+        # Task 02
+        joined_df, unresolved_stats = task02_resolve_metadata(spark, valid_df, meta_df, ou_df, output_dir)
+        logger.info(f"Task02 finished: {unresolved_stats}")
+
+        # Task 03
+        hier_df = task03_resolve_hierarchy(spark, joined_df, ou_df)
+        logger.info("Task03 finished")
+
+        # Task 04
+        quality_df, completeness_df = task04_quality_and_flags(spark, hier_df, prog_df, output_dir)
+        logger.info("Task04 finished")
+
+        # Task 05
+        fact_df = task05_build_dimensions_and_fact(spark, quality_df, meta_df, prog_df, output_dir, incremental=args.enable_b2)
+        logger.info("Task05 finished")
+
+        # Optional B1: validate fact contract
+        if args.enable_b1:
+            logger.info("Running B1 data contract validation")
+            validate_contract(fact_df)
+
+        # Task 06
+        task06_program_analytics(spark, fact_df, output_dir)
+        logger.info("Task06 finished")
+
+        # Task 07
+        task07_cross_country_aggregation(spark, fact_df, completeness_df, output_dir)
+        logger.info("Task07 finished")
+
+        # DQ checks
+        quarantine_rate = t1_stats.get("quarantined", 0) / max(1, t1_stats.get("exploded_total", 1))
+        if quarantine_rate > 0.10:
+            logger.error("Critical DQ: quarantine_rate > 10%")
+            sys.exit(2)
+
+        if fact_df.count() == 0:
+            logger.error("Critical DQ: fact table is empty")
+            sys.exit(2)
 
         logger.info("Pipeline completed successfully")
         sys.exit(0)
